@@ -1,0 +1,6 @@
+Tests: upstream
+Depends: @, @builddeps@
+
+Tests: build
+Restrictions: superficial
+Depends: g++, libglibmm-2.68-dev

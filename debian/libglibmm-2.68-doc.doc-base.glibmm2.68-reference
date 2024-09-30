@@ -1,0 +1,9 @@
+Document: glibmm2.68-reference
+Title: glibmm 2.68 Reference Manual
+Author: Doxygen
+Abstract: Reference Manual for glibmm 2.68 (C++ bindings for GLib)
+Section: Programming/C++
+
+Format: HTML
+Index: /usr/share/doc/glibmm-2.68/reference/html/index.html
+Files: /usr/share/doc/glibmm-2.68/reference/html/*.html
