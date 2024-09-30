@@ -1,0 +1,32 @@
+#!/bin/sh -eu
+
+workdir=$(mktemp -d)
+cleanup() {
+    rm -fr "$workdir"
+}
+trap cleanup 0 INT QUIT ABRT PIPE TERM
+cd "$workdir"
+
+out=out
+
+<<-\EOF g++ -x c++ - -o "$out" $(pkg-config --cflags --libs glibmm-2.68)
+	#include <glibmm.h>
+	
+	int main(int argc, char* argv[]) {
+	  Glib::RefPtr<Glib::Regex> r = Glib::Regex::create("^(.)([01]+)(.)$");
+	  if (r->get_capture_count() != 3) {
+	    return 1;
+	  }
+	
+	  Glib::ustring ascii = Glib::ustring("a0`~^!");
+	  Glib::ustring not_ascii = Glib::ustring("äç");
+	  if (not_ascii.is_ascii() || !ascii.is_ascii()) {
+	    return 2;
+	  }
+	  return 0;
+	}
+EOF
+
+echo "build: OK"
+./"$out"
+echo "run: OK"

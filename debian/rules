@@ -1,4 +1,29 @@
 #!/usr/bin/make -f
 
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all optimize=+lto
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1 -Wl,-z,defs
+
+# Only pay attention to symbols for select architectures
+# Only do this on Ubuntu since the benefit of this symbols tracking is unclear
+ifeq ($(shell dpkg-vendor --is Ubuntu && echo yes),yes)
+ifneq (,$(filter $(DEB_HOST_ARCH),amd64 arm64 ppc64el s390x hppa ia64 ppc64 sh4 sparc64))
+	export DPKG_GENSYMBOLS_CHECK_LEVEL = 4
+else
+	export DPKG_GENSYMBOLS_CHECK_LEVEL = 0
+endif
+else
+	export DPKG_GENSYMBOLS_CHECK_LEVEL = 0
+endif
+
 %:
-	dh $@
+	dh $@ --buildsystem=meson --without autoreconf
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		-Dmaintainer-mode=true \
+		-Dbuild-documentation=true \
+		-Dwarnings=max
+
+# Don't compress doxygen tag files
+override_dh_compress:
+	dh_compress -X.tag -X.cc
